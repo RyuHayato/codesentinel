@@ -7,7 +7,8 @@
     "test": "vitest run",
     "build": "tsc",
     "start": "node dist/cli.js",
-    "prepublishOnly": "npm run build && npm test"
+    "prepublishOnly": "npm run build && npm test",
+    "build:bundle": "esbuild src/cli.ts --bundle --platform=node --format=esm --target=node18 --outfile=dist/codesentinel.bundle.mjs"
   },
   "keywords": [
     "security",
@@ -23,6 +24,7 @@
   "devDependencies": {
     "@types/babel__traverse": "^7.28.0",
     "@types/node": "^26.6.4",
+    "esbuild": "^0.28.2",
     "typescript": "^7.0.2",
     "vitest": "^5.0.3"
   },
