@@ -49,10 +49,22 @@ export function loadConfig(root: string, explicitPath?: string): CodeSentinelCon
     throw new Error(`Invalid JSON in config file ${path}: ${(err as Error).message}`);
   }
 
+  const parsedRules = typeof parsed.rules === "object" && parsed.rules ? parsed.rules : {};
+  const rules: CodeSentinelConfig["rules"] = {};
+  for (const [id, value] of Object.entries(parsedRules)) {
+    if (value === "off" || value === "on" || isValidSeverity(value)) {
+      rules[id] = value as "off" | "on" | Severity;
+    } else {
+      throw new Error(`Invalid value for rule "${id}" in ${path}. Expected "off", "on", or a severity.`);
+    }
+  }
+
   const config: CodeSentinelConfig = {
     severity: isValidSeverity(parsed.severity) ? parsed.severity : DEFAULT_CONFIG.severity,
-    ignore: Array.isArray(parsed.ignore) ? [...new Set([...DEFAULT_CONFIG.ignore, ...parsed.ignore])] : [...DEFAULT_CONFIG.ignore],
-    rules: typeof parsed.rules === "object" && parsed.rules ? parsed.rules : {},
+    ignore: Array.isArray(parsed.ignore) && parsed.ignore.every((i) => typeof i === "string")
+      ? [...new Set([...DEFAULT_CONFIG.ignore, ...parsed.ignore])]
+      : [...DEFAULT_CONFIG.ignore],
+    rules,
     format: parsed.format === "json" || parsed.format === "sarif" ? parsed.format : "terminal",
     failOn: isValidSeverity(parsed.failOn as Severity) || parsed.failOn === "none" ? (parsed.failOn as Severity | "none") : "none",
   };

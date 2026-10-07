@@ -1,7 +1,7 @@
 import traverse from "@babel/traverse";
 import * as t from "@babel/types";
 import type { RawFinding, Rule, RuleContext } from "../types.js";
-import { calleeName, lineSnippet } from "../helpers.js";
+import { calleeName, containsRequestInput, lineSnippet, nodeText } from "../helpers.js";
 
 const MERGE_FUNCS = /^(merge|mergeWith|defaultsDeep|extend|extendDeep|assignDeep|deepMerge|deepAssign|deepExtend)$/;
 
@@ -49,11 +49,11 @@ const rule: Rule = {
         }
       },
       AssignmentExpression(path) {
-        // target[userControlledKey] = value
+        // target[userControlledKey] = value — only when the key derives from request input.
         const left = path.node.left;
         if (t.isMemberExpression(left) && left.computed) {
-          const text = ctx.source.slice(left.property.start ?? 0, left.property.end ?? 0);
-          if (/\b(req|request)\s*\.\s*(body|query|params)\b/.test(text) || t.isMemberExpression(left.property)) {
+          const text = nodeText(left.property, ctx.source);
+          if (containsRequestInput(text)) {
             findings.push({
               ruleId: rule.id,
               filePath: ctx.filePath,
@@ -71,9 +71,9 @@ const rule: Rule = {
         const leaf = name.split(".").pop() ?? "";
         if (MERGE_FUNCS.test(leaf)) {
           const argsText = path.node.arguments
-            .map((a) => ctx.source.slice(a.start ?? 0, a.end ?? 0))
+            .map((a) => nodeText(a as t.Node, ctx.source))
             .join(", ");
-          if (/\b(req|request)\s*\.\s*(body|query|params)\b|JSON\.parse/.test(argsText)) {
+          if (containsRequestInput(argsText) || argsText.includes("JSON.parse")) {
             findings.push({
               ruleId: rule.id,
               filePath: ctx.filePath,

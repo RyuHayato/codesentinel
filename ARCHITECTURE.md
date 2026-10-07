@@ -22,7 +22,7 @@ Reporters (src/reporters/{terminal,json,sarif}.ts)
 
 ### CLI — `src/cli.ts`
 
-Parses arguments (`--severity`, `--format`, `--fail-on`, `--config`, `--list-rules`), resolves the scan root, loads the config, invokes the scanner, picks a reporter, and computes the exit code. All user-facing error messages are produced here.
+Parses arguments (`--severity`, `--format`, `--fail-on`, `--config`, `--baseline`, `--write-baseline`, `--list-rules`, `--no-color`, `--version`), resolves the scan root, loads the config, invokes the scanner, applies baseline suppression, picks a reporter, and computes the exit code. All user-facing error messages are produced here. Invalid flags fail fast with a helpful message.
 
 ### File Scanner — `src/scanner/fileScanner.ts`
 
@@ -57,7 +57,11 @@ Detection is AST-first: rules visit `CallExpression`, `MemberExpression`, `Varia
 
 ### Finding Normalizer
 
-Converts `RawFinding` (rule output: location + message) into a full `Finding` by joining with rule metadata (title, description, CWE, remediation) and applying severity overrides. Unknown/internal findings (parse errors, rule crashes) get a safe fallback metadata block.
+Converts `RawFinding` (rule output: location + message) into a full `Finding` by joining with rule metadata (title, description, CWE, remediation) and applying severity overrides. Unknown/internal findings (parse errors, rule crashes) get a safe fallback metadata block. A separate crash path (`CS-ERR`) prevents a broken rule from inheriting the crashed rule's severity/metadata.
+
+### Baseline — `src/baseline.ts`
+
+Fingerprints each finding (`ruleId|filePath|line|column`) and, when `--baseline` is used, strips findings already recorded in the baseline file. `--write-baseline` snapshots the current findings so existing tech debt can be grandfathered in while CI blocks new ones.
 
 ### Severity Calculator — `src/types.ts`, `src/config.ts`
 

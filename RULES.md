@@ -16,6 +16,11 @@ Each rule implements: rule ID, title, description, severity, CWE reference, dete
 | CS-010 | Prototype pollution | high (medium for computed-key write) | CWE-1321 |
 | CS-011 | Unsafe deserialization | critical | CWE-502 |
 | CS-012 | Suspicious or deprecated dependency | high | CWE-1104 |
+| CS-013 | TLS verification disabled | high | CWE-295 |
+| CS-014 | Unsafe JWT handling | high (medium for `jwt.decode`) | CWE-347 |
+| CS-015 | Insecure randomness for security-sensitive values | medium | CWE-338 |
+| CS-016 | NoSQL injection | high | CWE-943 |
+| CS-017 | Insecure cookie configuration | medium (low when httpOnly missing) | CWE-614 |
 
 ## CS-001 — Hardcoded secret
 
@@ -107,6 +112,36 @@ const password = process.env.ADMIN_PASSWORD;
 **Detection:** `import`/`require` of known-risky packages (`node-serialize`, `event-stream`, `flatmap-stream`, `request`, `node-uuid`, `csurf`, `ua-parser-js`, `coa`, `rc`) and matching entries in `package.json` dependencies.
 
 **Remediation:** remove, replace, or pin upgraded versions (CWE-1104).
+
+## CS-017 — Insecure cookie configuration
+
+**Detection:** `res.cookie()`/`setCookie()` calls whose options contain `httpOnly: false` or `secure: false`, and calls that omit `httpOnly` entirely (low severity).
+
+**Remediation:** always set `{ httpOnly: true, secure: true, sameSite: 'Lax' }` on session cookies.
+
+## CS-013 — TLS verification disabled
+
+**Detection:** `rejectUnauthorized: false` in any options object, and `process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0"`.
+
+**Remediation:** never disable verification in production; fix CA/hostname issues or pass a proper CA chain.
+
+## CS-014 — Unsafe JWT handling
+
+**Detection:** `jwt.decode(...)` (skips verification), `jwt.sign(..., { algorithm: "none" })`, and `algorithms: ["none", ...]` in verify options.
+
+**Remediation:** always `jwt.verify()` with an explicit algorithm allow-list; never accept `none` for auth decisions.
+
+## CS-015 — Insecure randomness for security-sensitive values
+
+**Detection:** `Math.random()` assigned to a variable/property named like `token`, `secret`, `session`, `otp`, `salt`, `password`, ...
+
+**Remediation:** use `crypto.randomBytes()`, `crypto.randomUUID()`, or `crypto.randomInt()`.
+
+## CS-016 — NoSQL injection
+
+**Detection:** `$where` properties in query objects, and Mongo-style query calls (`find`, `findOne`, `update*`, `delete*`) whose first argument is raw request input (`req.body`, `req.query`) — including one-step variable propagation.
+
+**Remediation:** validate and cast input before querying; never pass `req.body`/`req.query` directly; strip `$`/`.` keys.
 
 ## Adding a new rule
 

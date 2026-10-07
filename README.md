@@ -4,7 +4,7 @@ A lightweight, open-source static-analysis security scanner for JavaScript and T
 
 ## Features
 
-- 12 built-in security rules (see [RULES.md](RULES.md)), each with a CWE reference and remediation advice
+- 17 built-in security rules (see [RULES.md](RULES.md)), each with a CWE reference and remediation advice
 - AST-based detection for JavaScript, TypeScript, JSX and TSX
 - Terminal, JSON, and SARIF output formats
 - Configurable severity filtering, rule overrides, ignore paths and inline `// codesentinel-ignore` suppression comments
@@ -40,7 +40,12 @@ codesentinel ./src --severity high          # only high + critical findings
 codesentinel ./src --format json            # machine-readable JSON
 codesentinel ./src --format sarif           # SARIF 2.1.0 for GitHub/code scanning
 codesentinel ./src --fail-on high           # exit 1 in CI when high/critical findings exist
+codesentinel ./src --write-baseline baseline.json  # snapshot current findings
+codesentinel ./src --baseline baseline.json         # suppress them next runs
 codesentinel --list-rules                   # show all rules
+codesentinel --list-rules --format json     # ...as JSON
+codesentinel ./src --no-color               # plain output
+codesentinel --version                      # print version
 ```
 
 ## Example: real vulnerable code and real detection
@@ -146,7 +151,7 @@ See [ARCHITECTURE.md](ARCHITECTURE.md). Rules are listed in [RULES.md](RULES.md)
 npm test
 ```
 
-34 tests cover every rule (vulnerable + safe fixtures), severity filtering, inline ignores, and the JSON/SARIF/terminal reporters.
+75 tests cover every rule (vulnerable + safe fixtures), severity filtering, inline ignores, config validation, file-scanner ignore semantics, baseline round-trips, and the CLI/JSON/SARIF/terminal reporters.
 
 ## License
 

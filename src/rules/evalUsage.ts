@@ -26,15 +26,18 @@ const rule: Rule = {
             snippet: lineSnippet(ctx.source, path.node.loc?.start.line ?? 0),
           });
         }
-        if ((name === "setTimeout" || name === "setInterval") && path.node.arguments[0] && t.isStringLiteral(path.node.arguments[0])) {
-          findings.push({
-            ruleId: rule.id,
-            filePath: ctx.filePath,
-            line: path.node.loc?.start.line ?? 0,
-            column: (path.node.loc?.start.column ?? 0) + 1,
-            message: `${name} called with a string argument — implicit eval.`,
-            snippet: lineSnippet(ctx.source, path.node.loc?.start.line ?? 0),
-          });
+        if ((name === "setTimeout" || name === "setInterval") && path.node.arguments[0]) {
+          const first = path.node.arguments[0];
+          if (t.isStringLiteral(first) || t.isTemplateLiteral(first)) {
+            findings.push({
+              ruleId: rule.id,
+              filePath: ctx.filePath,
+              line: path.node.loc?.start.line ?? 0,
+              column: (path.node.loc?.start.column ?? 0) + 1,
+              message: `${name} called with a string/template argument — implicit eval.`,
+              snippet: lineSnippet(ctx.source, path.node.loc?.start.line ?? 0),
+            });
+          }
         }
       },
       NewExpression(path) {

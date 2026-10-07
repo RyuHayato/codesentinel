@@ -1,7 +1,0 @@
-{
-  "severity": "low",
-  "format": "terminal",
-  "failOn": "none",
-  "ignore": ["examples", "tests/fixtures"],
-  "rules": {}
-}

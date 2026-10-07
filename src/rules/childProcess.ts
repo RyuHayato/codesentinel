@@ -1,7 +1,7 @@
 import traverse from "@babel/traverse";
 import * as t from "@babel/types";
 import type { RawFinding, Rule, RuleContext } from "../types.js";
-import { calleeName, lineSnippet } from "../helpers.js";
+import { calleeName, importedModules, lineSnippet } from "../helpers.js";
 
 const rule: Rule = {
   id: "CS-006",
@@ -14,11 +14,17 @@ const rule: Rule = {
     "Prefer execFile/spawn with an argument array and shell:false. Never interpolate user input into shell commands.",
   check(ctx: RuleContext): RawFinding[] {
     const findings: RawFinding[] = [];
+    // Only fire when the file actually uses child_process — otherwise a local
+    // function named `exec`/`spawn` would produce false positives.
+    const modules = importedModules(ctx.ast);
+    const usesChildProcess = modules.has("child_process");
     traverse(ctx.ast, {
       CallExpression(path) {
         const name = calleeName(path.node.callee) ?? "";
         const leaf = name.split(".").pop() ?? "";
+        const qualified = name.includes("child_process.");
         if (leaf === "exec" || leaf === "execSync") {
+          if (!usesChildProcess && !qualified) return;
           findings.push({
             ruleId: rule.id,
             filePath: ctx.filePath,
@@ -29,6 +35,7 @@ const rule: Rule = {
           });
         }
         if ((leaf === "spawn" || leaf === "spawnSync") && path.node.arguments.length >= 2) {
+          if (!usesChildProcess && !qualified) return;
           const opts = path.node.arguments[path.node.arguments.length - 1];
           if (t.isObjectExpression(opts)) {
             for (const prop of opts.properties) {

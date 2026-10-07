@@ -9,7 +9,7 @@ describe("scanner integration", () => {
   it("finds vulnerabilities in the vulnerable fixture set", () => {
     const result = scan({ root: "tests/fixtures/vulnerable", minSeverity: "low" });
     const ids = new Set(result.findings.map((f) => f.ruleId));
-    for (const expected of ["CS-001", "CS-002", "CS-003", "CS-004", "CS-005", "CS-006", "CS-007", "CS-008", "CS-009", "CS-010", "CS-011", "CS-012"]) {
+    for (const expected of ["CS-001", "CS-002", "CS-003", "CS-004", "CS-005", "CS-006", "CS-007", "CS-008", "CS-009", "CS-010", "CS-011", "CS-012", "CS-013", "CS-014", "CS-015", "CS-016", "CS-017"]) {
       expect(ids.has(expected), `missing finding ${expected}`).toBe(true);
     }
     expect(result.summary.total).toBeGreaterThan(10);

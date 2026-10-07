@@ -11,6 +11,11 @@ import weakCrypto from "./weakCrypto.js";
 import prototypePollution from "./prototypePollution.js";
 import unsafeDeserialization from "./unsafeDeserialization.js";
 import suspiciousDependencies from "./suspiciousDependencies.js";
+import insecureTls from "./insecureTls.js";
+import unsafeJwt from "./unsafeJwt.js";
+import insecureRandom from "./insecureRandom.js";
+import noSqlInjection from "./noSqlInjection.js";
+import insecureCookie from "./insecureCookie.js";
 
 export const ALL_RULES: Rule[] = [
   hardcodedSecrets,
@@ -25,6 +30,11 @@ export const ALL_RULES: Rule[] = [
   prototypePollution,
   unsafeDeserialization,
   suspiciousDependencies,
+  insecureTls,
+  unsafeJwt,
+  insecureRandom,
+  noSqlInjection,
+  insecureCookie,
 ];
 
 export const RULES_BY_ID = new Map<string, Rule>(ALL_RULES.map((r) => [r.id, r]));

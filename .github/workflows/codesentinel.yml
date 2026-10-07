@@ -26,8 +26,8 @@ jobs:
       - name: Build CodeSentinel
         run: npm ci && npm run build
 
-      - name: Scan with CodeSentinel
-        run: node dist/cli.js . --format sarif --fail-on high > codesentinel.sarif || true
+      - name: Scan with CodeSentinel (SARIF for code scanning)
+        run: node dist/cli.js src --format sarif --fail-on high > codesentinel.sarif || true
 
       - name: Upload SARIF to GitHub code scanning
         uses: github/codeql-action/upload-sarif@v3
@@ -35,4 +35,4 @@ jobs:
           sarif_file: codesentinel.sarif
 
       - name: Fail on high severity findings
-        run: node dist/cli.js . --severity high --fail-on high
+        run: node dist/cli.js src --severity high --fail-on high

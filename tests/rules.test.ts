@@ -72,6 +72,31 @@ const CASES: Array<{ ruleId: string; vulnerable: string | string[]; safe: string
     vulnerable: "tests/fixtures/vulnerable/suspiciousDependencies.js",
     safe: "tests/fixtures/safe/suspiciousDependencies.js",
   },
+  {
+    ruleId: "CS-013",
+    vulnerable: "tests/fixtures/vulnerable/insecureTls.js",
+    safe: "tests/fixtures/safe/insecureTls.js",
+  },
+  {
+    ruleId: "CS-014",
+    vulnerable: "tests/fixtures/vulnerable/unsafeJwt.js",
+    safe: "tests/fixtures/safe/unsafeJwt.js",
+  },
+  {
+    ruleId: "CS-015",
+    vulnerable: "tests/fixtures/vulnerable/insecureRandom.js",
+    safe: "tests/fixtures/safe/insecureRandom.js",
+  },
+  {
+    ruleId: "CS-016",
+    vulnerable: "tests/fixtures/vulnerable/noSqlInjection.js",
+    safe: "tests/fixtures/safe/noSqlInjection.js",
+  },
+  {
+    ruleId: "CS-017",
+    vulnerable: "tests/fixtures/vulnerable/insecureCookie.js",
+    safe: "tests/fixtures/safe/insecureCookie.js",
+  },
 ];
 
 describe("rules", () => {

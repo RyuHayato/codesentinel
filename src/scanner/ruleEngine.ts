@@ -89,11 +89,11 @@ export function scan(options: ScanOptions): ScanResult {
       } catch (err) {
         findings = [
           {
-            ruleId: rule.id,
+            ruleId: "CS-ERR",
             filePath: rel,
             line: 1,
             column: 1,
-            message: `Rule crashed: ${(err as Error).message}`,
+            message: `Rule ${rule.id} crashed: ${(err as Error).message}`,
             snippet: "",
           },
         ];

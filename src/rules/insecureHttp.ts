@@ -1,7 +1,7 @@
 import traverse from "@babel/traverse";
 import * as t from "@babel/types";
 import type { RawFinding, Rule, RuleContext } from "../types.js";
-import { lineSnippet } from "../helpers.js";
+import { bareModuleId, lineSnippet } from "../helpers.js";
 
 const rule: Rule = {
   id: "CS-008",
@@ -31,7 +31,7 @@ const rule: Rule = {
         const callee = path.node.callee;
         if (t.isIdentifier(callee) && callee.name === "require") {
           const arg = path.node.arguments[0];
-          if (arg && t.isStringLiteral(arg) && arg.value === "http") {
+          if (arg && t.isStringLiteral(arg) && bareModuleId(arg.value) === "http") {
             findings.push({
               ruleId: rule.id,
               filePath: ctx.filePath,
@@ -44,7 +44,7 @@ const rule: Rule = {
         }
       },
       ImportDeclaration(path) {
-        if (path.node.source.value === "http") {
+        if (bareModuleId(path.node.source.value) === "http") {
           findings.push({
             ruleId: rule.id,
             filePath: ctx.filePath,
