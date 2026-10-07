@@ -9,7 +9,20 @@ A lightweight, open-source static-analysis security scanner for JavaScript and T
 - Terminal, JSON, and SARIF output formats
 - Configurable severity filtering, rule overrides, ignore paths and inline `// codesentinel-ignore` suppression comments
 - CI-friendly exit codes (`--fail-on`)
+- Baseline files to grandfather existing findings
 - Extensible architecture — Python support can be added by registering new parser + rules
+
+## Supported languages
+
+- JavaScript (`.js`, `.jsx`, `.mjs`, `.cjs`)
+- TypeScript (`.ts`, `.tsx`)
+- Dependency audit of `package.json`
+
+Python can be added later through the parser/rule registration extension point (see [ARCHITECTURE.md](ARCHITECTURE.md)).
+
+## How it works
+
+`codesentinel <path>` collects source files, parses each into a Babel AST, runs all registered rules over the AST, normalizes raw matches into findings joined with rule metadata (title, CWE, remediation), applies severity filtering and de-duplication, then renders the result through a reporter (terminal, JSON, or SARIF). Baseline files can suppress known findings. See [ARCHITECTURE.md](ARCHITECTURE.md) for the full pipeline.
 
 ## Install
 
@@ -152,6 +165,14 @@ npm test
 ```
 
 75 tests cover every rule (vulnerable + safe fixtures), severity filtering, inline ignores, config validation, file-scanner ignore semantics, baseline round-trips, and the CLI/JSON/SARIF/terminal reporters.
+
+## Roadmap
+
+- Python rules via the parser extension point
+- Taint-tracking through function calls across files
+- Autofix patches for common findings
+- GitHub App / pre-commit integration
+- More rule families (XXE, SSRF, open redirect, log injection)
 
 ## License
 

@@ -39,7 +39,7 @@ Examples:
   codesentinel ./src --format sarif --fail-on high
 `;
 
-export const VERSION = "0.2.0";
+export const VERSION = "1.0.0";
 
 interface ParsedArgs {
   path: string | null;
